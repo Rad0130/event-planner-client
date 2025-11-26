@@ -42,7 +42,7 @@ export default async function EventsPage() {
             className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition"
           >
             <div className="relative h-48 w-full bg-gray-200">
-              <Image
+              <img
                 src={event.Image}
                 alt={event.EventName}
                 width={500}
