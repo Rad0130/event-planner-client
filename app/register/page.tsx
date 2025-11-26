@@ -1,34 +1,30 @@
 "use client";
 import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 
-interface LoginFormData {
+interface RegisterFormData {
+  name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
-export default function Login() {
-  const [formData, setFormData] = useState<LoginFormData>({
+export default function Register() {
+  const [formData, setFormData] = useState<RegisterFormData>({
+    name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [success, setSuccess] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
-
-  useEffect(() => {
-    const message = searchParams.get("message");
-    if (message) {
-      setMessage(message);
-    }
-  }, [searchParams]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -36,70 +32,89 @@ export default function Login() {
     if (error) setError("");
   };
 
-  const handleCredentialsLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError("");
 
+    // Validation
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const result = await signIn("credentials", {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
-      if (result?.error) {
-        setError("Invalid email or password. Please try again.");
-      } else if (result?.ok) {
-        // Success - redirect to the intended page or home
-        router.push(callbackUrl);
-        router.refresh();
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Registration failed');
+        return;
       }
+
+      setSuccess(true);
+      
+      // Auto-redirect to login after success
+      setTimeout(() => {
+        router.push("/login?message=Registration successful! Please login with your credentials.");
+      }, 2000);
+      
     } catch (error) {
-      setError("An error occurred during login");
+      setError("Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleRegister = async () => {
     setLoading(true);
     try {
-      await signIn("google", { callbackUrl });
+      await signIn("google", { callbackUrl: "/" });
     } catch (error) {
-      setError("Google login failed");
+      setError("Google registration failed");
       setLoading(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    setFormData({
-      email: "admin@example.com",
-      password: "123456"
-    });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-md">
         <div>
+          <div className="mx-auto h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
+            <UserPlus className="h-6 w-6 text-indigo-600" />
+          </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            Create your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{" "}
-            <button
-              onClick={handleDemoLogin}
-              className="font-medium text-indigo-600 hover:text-indigo-500"
-            >
-              use demo credentials
-            </button>
+            <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+              sign in to your existing account
+            </Link>
           </p>
         </div>
 
-        {message && (
+        {success && (
           <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
-            {message}
+            Registration successful! Redirecting to login...
           </div>
         )}
 
@@ -109,8 +124,25 @@ export default function Login() {
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleCredentialsLogin}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Full Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                autoComplete="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Enter your full name"
+              />
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -137,12 +169,12 @@ export default function Login() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   required
                   value={formData.password}
                   onChange={handleChange}
                   className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10"
-                  placeholder="Enter your password"
+                  placeholder="Enter your password (min. 6 characters)"
                 />
                 <button
                   type="button"
@@ -157,18 +189,48 @@ export default function Login() {
                 </button>
               </div>
             </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                Confirm Password
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm pr-10"
+                  placeholder="Confirm your password"
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4 text-gray-400" />
+                  ) : (
+                    <Eye className="h-4 w-4 text-gray-400" />
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
 
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || success}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300"
             >
               {loading ? (
                 <Loader2 className="animate-spin h-4 w-4 mr-2" />
               ) : null}
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
           </div>
         </form>
@@ -185,7 +247,7 @@ export default function Login() {
 
           <div className="mt-6">
             <button
-              onClick={handleGoogleLogin}
+              onClick={handleGoogleRegister}
               disabled={loading}
               className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300"
             >
@@ -207,20 +269,14 @@ export default function Login() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              Sign in with Google
+              Sign up with Google
             </button>
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500 mb-4">
-            Demo credentials: admin@example.com / 123456
-          </p>
-          <p className="text-sm text-gray-600">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign up here
-            </Link>
+          <p className="text-xs text-gray-500">
+            By creating an account, you agree to our Terms of Service and Privacy Policy.
           </p>
         </div>
       </div>
