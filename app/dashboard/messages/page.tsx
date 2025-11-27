@@ -38,7 +38,7 @@ export default function MessagesManagement() {
 
   const fetchMessages = async () => {
     try {
-      const response = await fetch('http://localhost:5000/messages');
+      const response = await fetch('https://event-planner-server-zsc1.onrender.com');
       const data = await response.json();
       setMessages(data);
     } catch (error) {
@@ -56,7 +56,7 @@ export default function MessagesManagement() {
 
   const updateMessageStatus = async (messageId: string, newStatus: string, adminReply?: string) => {
     try {
-      const response = await fetch(`http://localhost:5000/messages/${messageId}`, {
+      const response = await fetch(`https://event-planner-server-zsc1.onrender.com/${messageId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ export default function MessagesManagement() {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/messages/${messageId}`, {
+        const response = await fetch(`https://event-planner-server-zsc1.onrender.com/${messageId}`, {
           method: 'DELETE'
         });
 
