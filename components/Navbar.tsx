@@ -164,6 +164,13 @@ export default function Navbar() {
                     >
                       <span>Manage Events</span>
                     </Link>
+                    <Link 
+                      href="/dashboard/my-bookings" 
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      My Bookings
+                    </Link>
                     
                     <div className="border-t border-gray-100 mt-2 pt-2">
                       <button 
@@ -256,6 +263,13 @@ export default function Navbar() {
                   onClick={handleMobileLinkClick}
                 >
                   Manage Events
+                </Link>
+                <Link 
+                  href="/dashboard/my-bookings" 
+                  className="block py-2 text-gray-700 hover:text-indigo-600 transition"
+                  onClick={() => setIsOpen(false)}
+                >
+                  My Bookings
                 </Link>
                 
                 <button 

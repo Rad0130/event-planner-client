@@ -1,14 +1,23 @@
 "use client";
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Loader2 } from "lucide-react";
+import Swal from "sweetalert2";
+
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
     subject: "",
     message: ""
   });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -17,11 +26,43 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
-    alert("Thank you for your message! We'll get back to you soon.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        await Swal.fire({
+          title: 'Message Sent!',
+          text: 'Thank you for your message! We will get back to you soon.',
+          icon: 'success',
+          confirmButtonColor: '#4f46e5',
+          confirmButtonText: 'OK'
+        });
+        
+        setFormData({ name: "", email: "", subject: "", message: "" });
+      } else {
+        throw new Error('Failed to send message');
+      }
+    } catch (error) {
+      await Swal.fire({
+        title: 'Error!',
+        text: 'Failed to send message. Please try again.',
+        icon: 'error',
+        confirmButtonColor: '#dc2626',
+        confirmButtonText: 'OK'
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -162,10 +203,15 @@ export default function Contact() {
 
             <button
               type="submit"
-              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300 flex items-center justify-center"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send className="w-5 h-5 mr-2" />
-              Send Message
+              {loading ? (
+                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              ) : (
+                <Send className="w-5 h-5 mr-2" />
+              )}
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
         </div>
