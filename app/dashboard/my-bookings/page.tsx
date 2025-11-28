@@ -49,7 +49,7 @@ export default function MyBookings() {
 
   const fetchBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/bookings/user/${session?.user?.email}`);
+      const response = await fetch(`https://event-planner-server-zsc1.onrender.com//bookings/user/${session?.user?.email}`);
       const data = await response.json();
       setBookings(data);
     } catch (error) {
@@ -78,7 +78,7 @@ export default function MyBookings() {
 
     if (result.isConfirmed) {
       try {
-        const response = await fetch(`http://localhost:5000/bookings/${bookingId}`, {
+        const response = await fetch(`https://event-planner-server-zsc1.onrender.com//bookings/${bookingId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

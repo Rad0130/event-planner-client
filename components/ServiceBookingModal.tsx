@@ -77,7 +77,7 @@ export default function ServiceBookingModal({ isOpen, onClose, service }: Servic
         isServiceBooking: true // Flag to identify service bookings
       };
 
-      const response = await fetch('http://localhost:5000/bookings', {
+      const response = await fetch('https://event-planner-server-zsc1.onrender.com//bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
