@@ -31,7 +31,7 @@ export default function Contact() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://event-planner-server-zsc1.onrender.com', {
+      const response = await fetch('https://event-planner-server-zsc1.onrender.com/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

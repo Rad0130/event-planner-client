@@ -1,10 +1,6 @@
-/* app/globals.css */
-
-@import "tailwindcss";
-
-:root {
-  --color-primary: 59 130 246;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
   body {
@@ -26,22 +22,21 @@
     transition-property: transform, box-shadow;
     transition-duration: 300ms;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    
-    &:hover {
-      transform: translateY(-0.25rem);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    }
-    
-    &:focus {
-      transform: translateY(-0.25rem);
-      box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-      outline: 2px solid rgb(99 102 241);
-      outline-offset: 2px;
-    }
-    
     border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     border: 1px solid rgb(243 244 246);
+  }
+  
+  .event-card:hover {
+    transform: translateY(-0.25rem);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+  
+  .event-card:focus {
+    transform: translateY(-0.25rem);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    outline: 2px solid rgb(99 102 241);
+    outline-offset: 2px;
   }
 }

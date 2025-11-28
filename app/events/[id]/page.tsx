@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { use } from "react";
 import Link from "next/link";
 import { ArrowLeft, Calendar, DollarSign, Tag, Users } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
@@ -20,15 +19,13 @@ interface Event {
 }
 
 interface EventDetailsProps {
-  params: Promise<{
+  params: {
     id: string;
-  }>;
+  };
 }
 
 export default function EventDetails({ params }: EventDetailsProps) {
-  // Use the use() hook to unwrap the params promise
-  const { id } = use(params);
-  
+  const { id } = params; // FIXED: Removed use() hook
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
@@ -50,7 +47,7 @@ export default function EventDetails({ params }: EventDetailsProps) {
     };
 
     fetchEvent();
-  }, [id]); // Use id instead of params.id
+  }, [id]);
 
   if (loading) {
     return (
@@ -86,7 +83,6 @@ export default function EventDetails({ params }: EventDetailsProps) {
           <ArrowLeft size={18} className="mr-2" /> Back to Events
         </Link>
 
-        {/* Banner & Title */}
         <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="relative h-[400px] w-full bg-gray-200">
             <img
@@ -101,13 +97,11 @@ export default function EventDetails({ params }: EventDetailsProps) {
           </div>
 
           <div className="p-8 grid md:grid-cols-3 gap-8">
-            {/* Event Description */}
             <div className="md:col-span-2">
               <h2 className="text-3xl font-bold mb-4">Full Description</h2>
               <p className="text-gray-700 leading-relaxed text-lg">{event.fullDescription}</p>
             </div>
 
-            {/* Meta Info */}
             <div className="md:col-span-1 space-y-6 border-l md:border-t-0 border-gray-200 pl-8 pt-8 md:pt-0">
               <h2 className="text-2xl font-bold mb-4 text-indigo-600">Event Details</h2>
               
@@ -132,7 +126,7 @@ export default function EventDetails({ params }: EventDetailsProps) {
               </div>
               
               <div className="pt-4">
-                <button 
+                <button
                   onClick={() => setIsBookingModalOpen(true)}
                   className="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold hover:bg-indigo-700 transition duration-300 shadow-md flex items-center justify-center"
                 >
@@ -145,7 +139,6 @@ export default function EventDetails({ params }: EventDetailsProps) {
         </div>
       </div>
 
-      {/* Booking Modal */}
       <BookingModal
         isOpen={isBookingModalOpen}
         onClose={() => setIsBookingModalOpen(false)}
