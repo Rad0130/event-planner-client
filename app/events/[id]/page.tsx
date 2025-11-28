@@ -5,7 +5,7 @@ import { ArrowLeft, Calendar, DollarSign, Tag, Users } from "lucide-react";
 import { formatCurrency, cn } from "@/lib/utils";
 import BookingModal from "@/components/BookingModal";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://event-planner-server-zsc1.onrender.com/';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://event-planner-server-zsc1.onrender.com';
 
 interface Event {
   _id: string;

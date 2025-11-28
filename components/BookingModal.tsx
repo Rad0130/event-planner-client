@@ -56,7 +56,7 @@ export default function BookingModal({ isOpen, onClose, event }: BookingModalPro
     setLoading(true);
 
     try {
-      const response = await fetch('https://event-planner-server-zsc1.onrender.com//bookings', {
+      const response = await fetch('https://event-planner-server-zsc1.onrender.com/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
