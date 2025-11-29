@@ -1,5 +1,14 @@
-import NextAuth from "next-auth";
+// types/auth.ts
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  password: string;
+  image: string | null;
+  createdAt: string;
+}
 
+// NextAuth type extensions
 declare module "next-auth" {
   interface Session {
     user: {

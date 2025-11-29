@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
       name,
       email,
       password, // In production, use bcrypt to hash this!
+      image: null, // ✅ ADD THIS LINE - missing image property
       createdAt: new Date().toISOString(),
     };
 
